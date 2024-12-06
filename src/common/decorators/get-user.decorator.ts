@@ -8,7 +8,7 @@ export const GetUser = createParamDecorator((_, ctx: ExecutionContextHost) => {
   const accessToken = authorization.split(' ')[1];
 
   if (request.user.accessToken !== accessToken) {
-    throw new UnauthorizedException('login failed');
+    throw new UnauthorizedException('token expiration');
   }
 
   return request.user;
