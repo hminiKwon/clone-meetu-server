@@ -70,12 +70,18 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private async updateHashedRefreshToken(id: number, refreshToken: string) {
+  private async updateHashedToken(
+    id: number,
+    accessToken: string,
+    refreshToken: string,
+  ) {
     const salt = await bcrypt.genSalt();
+    // const hashedAccessToken = await bcrypt.hash(accessToken, salt);
     const hashedRefreshToken = await bcrypt.hash(refreshToken, salt);
 
     try {
       await this.userRepository.update(id, {
+        accessToken,
         hashedRefreshToken,
       });
     } catch (error) {
@@ -93,9 +99,9 @@ export class AuthService {
     }
 
     const { accessToken, refreshToken } = await this.getTokens({ userId });
-    await this.updateHashedRefreshToken(user.id, refreshToken);
+    await this.updateHashedToken(user.id, accessToken, refreshToken);
 
-    return { accessToken, refreshToken };
+    return { accessToken };
   }
 
   async refreshToken(user: User) {
@@ -108,13 +114,13 @@ export class AuthService {
       throw new ForbiddenException();
     }
 
-    await this.updateHashedRefreshToken(user.id, refreshToken);
+    await this.updateHashedToken(user.id, accessToken, refreshToken);
 
-    return { accessToken, refreshToken };
+    return { accessToken };
   }
 
   getProfile(user: User) {
-    const { password, hashedRefreshToken, ...rest } = user;
+    const { password, accessToken, hashedRefreshToken, ...rest } = user;
 
     return { ...rest };
   }

@@ -42,6 +42,9 @@ export class User extends BaseEntity {
   deletedAt: Date | null;
 
   @Column({ nullable: true })
+  accessToken?: string;
+
+  @Column({ nullable: true })
   hashedRefreshToken?: string;
 
   @OneToMany(() => Room, (room) => room.user, { eager: false })
